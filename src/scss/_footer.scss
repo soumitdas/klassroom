@@ -1,0 +1,14 @@
+footer.footer {
+  .logo {
+    img {
+      width: auto;
+      height: $footer-logo-height;
+    }
+  }
+}
+
+/* for sticky footer 94px 
+.section {
+  min-height: calc(100vh - 6rem);
+}
+*/
