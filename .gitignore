@@ -3,6 +3,8 @@ node_modules
 misc
 dist
 
+.firebase
+
 functions
 src/firebase.js
 

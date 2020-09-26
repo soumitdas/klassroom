@@ -68,7 +68,7 @@
             <b-field>
                 <b-input v-model="postReply" expanded placeholder="Type your reply..." icon="comment"></b-input>
                 <p class="control">
-                <b-button :disabled="postReply < 1" :loading="isReplyLoading" icon-left="send"></b-button>
+                <b-button native-type="submit" :disabled="postReply < 1" :loading="isReplyLoading" icon-left="send"></b-button>
                 </p>
             </b-field>
           </form>

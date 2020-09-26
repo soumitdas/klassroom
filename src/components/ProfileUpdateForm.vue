@@ -18,15 +18,15 @@
     </b-field>
     <hr>
     <b-field horizontal label="Name">
-      <b-input v-model="name" name="name" required/>
+      <b-input v-model="name" name="name" />
       <p class="control">
-          <b-button :disabled="!isNameChanged" :loading="isLoading" class="button is-primary" @click="updateName">Update</b-button>
+          <b-button :disabled="!isNameChanged || name === ''" :loading="isLoading" class="button is-primary" @click="updateName">Update</b-button>
       </p>
     </b-field>
     <b-field horizontal label="E-mail">
-      <b-input v-model="email" name="email" type="email" required/>
+      <b-input v-model="email" name="email" type="email" />
       <p class="control">
-          <b-button :disabled="!isEmailChanged" class="button is-primary">Update</b-button>
+          <b-button :disabled="!isEmailChanged || email === ''" :loading="isEmailLoading" class="button is-primary" @click="updateEmail">Update</b-button>
       </p>
     </b-field>
   </card-component>
@@ -36,7 +36,7 @@
 import { mapState } from 'vuex'
 //import FilePicker from '@/components/FilePicker'
 import CardComponent from '@/components/CardComponent'
-import {auth, storage} from '../firebase'
+import {auth, storage, firebase} from '../firebase'
 
 export default {
   name: 'ProfileUpdateForm',
@@ -47,6 +47,7 @@ export default {
     return {
       isFileUploaded: false,
       isLoading: false,
+      isEmailLoading: false,
       isAvatarLoading: false,
       avatar: null,
       name: '',
@@ -59,7 +60,7 @@ export default {
       return this.name !== this.user.name
     },
     isEmailChanged() {
-      return this.email !== this.user.email
+      return this.email !== this.user.email || this.email !== ''
     }
   },
   methods: {
@@ -84,6 +85,58 @@ export default {
           queue: false
         })
       })
+    },
+    updateEmail() {
+      this.isEmailLoading = true
+      const url = `${window.location.protocol}//${window.location.hostname}`
+      auth.currentUser.updateEmail(this.email)
+        .then(() => auth.currentUser.sendEmailVerification({ url , handleCodeInApp: false }))
+        .then(() => {
+          this.isEmailLoading = false
+          this.email = ''
+          this.$store.dispatch('fetchAuthUser')
+          this.$buefy.snackbar.open({
+            message: 'Email Updated. Please verify your email',
+            queue: false
+          })
+        })
+        .catch(e => {
+          if (e.code === 'auth/requires-recent-login') {
+            this.$buefy.dialog.prompt({
+                message: 'Authenticate yourself',
+                inputAttrs: {
+                    type: 'password',
+                    placeholder: 'Enter your password',
+                },
+                confirmText: 'Submit',
+                trapFocus: true,
+                onConfirm: (value) => {
+                  this.reAuth(value)
+                    .then(() => this.updateEmail())
+                    .catch(e => this.$buefy.snackbar.open({
+                      message: `Error: ${e.message}`,
+                      queue: false
+                    }))
+                }
+            })
+          } else {
+            this.isEmailLoading = false
+            this.$buefy.snackbar.open({
+              message: `Error: ${e.message}`,
+              queue: false
+            })
+          }
+        })
+    },
+    /*updateEmailOnDatabase(newEmail) {
+      const url = `${window.location.protocol}//${window.location.hostname}`
+      return auth.currentUser.sendEmailVerification({ url , handleCodeInApp: false })
+        .then(() => db.doc(`users/${this.user.uid}`).update({ studentData: { email: newEmail } }))
+    },*/
+    reAuth(password) {
+      const user = auth.currentUser
+      const credential = firebase.auth.EmailAuthProvider.credential(user.email, password)
+      return user.reauthenticateWithCredential(credential)
     },
     updateAvatar() {
       if (this.avatar.size < 204800) {

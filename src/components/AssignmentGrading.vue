@@ -135,8 +135,7 @@ export default {
                     this.submissions = assignments
                     this.isLoading = false
                 })
-                .catch(e => {
-                    console.log(e.message)
+                .catch(() => {
                     this.isLoading = false
                 })
         },

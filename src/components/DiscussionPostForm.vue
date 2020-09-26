@@ -156,7 +156,6 @@ export default {
           type: "is-danger",
           queue: false
         })
-        console.error(e)
       }
     },
     async updatePost() {
@@ -189,7 +188,6 @@ export default {
           type: "is-danger",
           queue: false
         })
-        console.error(e)
       }
     }
   },

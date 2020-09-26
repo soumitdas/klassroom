@@ -8,6 +8,29 @@
       </div>
     </title-bar>
 
+    <div class="level">
+      <div class="level-left">
+        <b-field grouped>
+          <p class="control">
+              <b-switch v-model="searchable">
+                  Searchable
+              </b-switch>
+          </p>
+        </b-field>
+      </div>
+      <div class="level-right">
+        <b-field grouped>
+          <b-select v-model="perPage">
+            <option value="10">10 per page</option>
+            <option value="15">15 per page</option>
+            <option value="20">20 per page</option>
+            <option value="30">30 per page</option>
+            <option value="50">50 per page</option>
+          </b-select>
+        </b-field>
+      </div>
+    </div>
+
     <card-component class="has-table" title="Teacher Table" icon="account-multiple" headerIcon="refresh" @header-icon-click="fetchTeachers">
       <b-table
         :checkable="true"
@@ -16,11 +39,12 @@
         :per-page="perPage"
         :striped="false"
         :hoverable="true"
+        :mobile-cards="false"
         default-sort="univRoll"
         :data="teachers">
 
         <template slot-scope="props">
-          <b-table-column label="Name" field="name" sortable>
+          <b-table-column label="Name" field="name" :searchable="searchable" sortable>
             {{ props.row.name }}
           </b-table-column>
           <b-table-column label="Department" field="dept">
@@ -84,6 +108,7 @@ export default {
       isEditing: false,
       isLoading: false,
       perPage: 10,
+      searchable: false
     }
   },
   computed: {

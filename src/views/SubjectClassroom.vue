@@ -30,7 +30,7 @@
         <b-skeleton v-if="isPageLoading"></b-skeleton>
         <b-collapse v-for="(lecture, index) in lectures" :key="lecture.id" 
           class="card" animation="slide" aria-id="contentIdForA11y3"
-          :open="false">
+          :open="index === 0 ? true : false">
           <div
               slot="trigger" 
               slot-scope="props"
@@ -60,7 +60,7 @@
                   <strong>End Time</strong>: {{lecture.endTime.toLocaleTimeString()}}
                 </p>
                 <p>
-                  <strong>{{lecture.virtualMeet.platform}} Link</strong>: <a :href="lecture.virtualMeet.url">{{lecture.virtualMeet.url}}</a>
+                  <strong>{{lecture.virtualMeet.platform}} Link</strong>: <a :href="lecture.virtualMeet.url" target="_blank" rel="noopener noreferrer">{{lecture.virtualMeet.url}}</a>
                 </p>
                 <p>
                   <small>Created By: {{lecture.createdBy.name}}</small>
@@ -92,7 +92,7 @@
             class="card-header"
             role="button"
             aria-controls="contentIdForA11y3"
-          >
+            :open="index === 0 ? true : false">
             <p class="card-header-title">
               <b-icon icon="school" custom-size="default" />
               {{assignment.title}}

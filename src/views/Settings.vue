@@ -1,11 +1,18 @@
 <template>
-  <h1>Under Construction</h1>
+  <section class="section">
+    <title-bar>
+      {{$route.meta.title}}
+      <b-button type="is-primary" icon-left="refresh" slot="button">Refresh</b-button>
+    </title-bar>
+  </section>
 </template>
 
 <script>
-export default {
-    name: 'Settings'
+import TitleBar from '@/components/TitleBar'
 
+export default {
+    name: 'Settings',
+    components: { TitleBar },
 }
 </script>
 

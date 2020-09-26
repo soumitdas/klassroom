@@ -7,6 +7,39 @@
       </div>
     </title-bar>
 
+    <div class="level">
+      <div class="level-left">
+        <b-field grouped group-multiline>
+          <p class="control">
+              <b-switch v-model="visible.schedule">
+                  Show Schedule
+              </b-switch>
+          </p>
+          <p class="control">
+              <b-switch v-model="visible.startEndDate">
+                  Show Start and End date
+              </b-switch>
+          </p>
+          <p class="control">
+              <b-switch v-model="searchable">
+                  Searchable
+              </b-switch>
+          </p>
+        </b-field>
+      </div>
+      <div class="level-right">
+        <b-field grouped>
+          <b-select v-model="perPage">
+            <option value="10">10 per page</option>
+            <option value="15">15 per page</option>
+            <option value="20">20 per page</option>
+            <option value="30">30 per page</option>
+            <option value="50">50 per page</option>
+          </b-select>
+        </b-field>
+      </div>
+    </div>
+
     <card-component class="has-table" title="Subject Table" icon="account-multiple" headerIcon="refresh" @header-icon-click="fetchSubjects">
       <b-table
         :checkable="true"
@@ -15,14 +48,15 @@
         :per-page="perPage"
         :striped="false"
         :hoverable="true"
+        :mobile-cards="false"
         default-sort="subjectCode"
         :data="subjects">
 
         <template slot-scope="props">
-          <b-table-column label="Subject Code" field="subjectCode" sortable>
+          <b-table-column label="Subject Code" field="subjectCode" :searchable="searchable" sortable>
             {{ props.row.subjectCode }}
           </b-table-column>
-          <b-table-column label="Subject Name" field="name" sortable>
+          <b-table-column label="Subject Name" field="name" :searchable="searchable" sortable>
             {{ props.row.name }}
           </b-table-column>
           <b-table-column label="Students" field="students" centered>
@@ -35,15 +69,15 @@
               <b-tag v-for="t in props.row.teachers" :key="t.uid">{{ t.name }}</b-tag>
             </b-taglist>
           </b-table-column>
-          <b-table-column label="Schedule" field="schedule" centered>
+          <b-table-column label="Schedule" field="schedule" :visible="visible.schedule" centered>
             <b-taglist>
               <b-tag v-for="s in props.row.schedule" :key="s.uid">{{ days[s.day] }} - {{ s.start.toLocaleTimeString('en-IN') }} to {{ s.end.toLocaleTimeString('en-IN') }}</b-tag>
             </b-taglist>
           </b-table-column>
-          <b-table-column label="Start Date" field="startDate" centered>
+          <b-table-column label="Start Date" field="startDate" :visible="visible.startEndDate" centered>
             {{ props.row.startDate.toLocaleDateString('en-IN') }}
           </b-table-column>
-          <b-table-column label="End Date" field="endDate" centered>
+          <b-table-column label="End Date" field="endDate" :visible="visible.startEndDate" centered>
             {{ props.row.endDate.toLocaleDateString('en-IN') }}
           </b-table-column>
           <b-table-column custom-key="actions" class="is-actions-cell">
@@ -203,6 +237,11 @@ export default {
       isLoading: false,
       isButtonLoading: false,
       perPage: 10,
+      searchable: false,
+      visible: {
+        schedule: false,
+        startEndDate: false
+      },
 
       days: [
         'Monday',

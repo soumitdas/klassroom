@@ -16,6 +16,7 @@ export default new Vuex.Store({
       phone: null
     },
     userRole: [],
+    userEmailVerified: null,
 
     // Students
     students: [],
@@ -47,18 +48,20 @@ export default new Vuex.Store({
     /* User */
     setUser (state, payload) {
       if (payload) {
-        state.user.uid = payload.uid,
-        state.user.name = payload.displayName || null,
-        state.user.email = payload.email || null,
-        state.user.photoUrl = payload.photoURL || null,
+        state.user.uid = payload.uid
+        state.user.name = payload.displayName || null
+        state.user.email = payload.email || null
+        state.user.photoUrl = payload.photoURL || null
         state.user.phone = payload.phoneNumber || null
+        state.userEmailVerified = payload.emailVerified
       } else {
-        state.user.uid = null,
-        state.user.name = null,
-        state.user.email = null,
-        state.user.photoUrl = null,
-        state.user.phone = null,
+        state.user.uid = null
+        state.user.name = null
+        state.user.email = null
+        state.user.photoUrl = null
+        state.user.phone = null
         state.userRole = []
+        state.userEmailVerified = null
       }      
     },
     setUserRole (state, payload) {

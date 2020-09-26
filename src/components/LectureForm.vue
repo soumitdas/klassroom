@@ -95,6 +95,7 @@
                     checkable
                     checkbox-position="right"
                     :hoverable="true"
+                    :mobile-cards="false"
                     default-sort="univRoll">
 
                     <template slot="bottom-left">
