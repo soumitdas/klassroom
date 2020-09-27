@@ -16,7 +16,7 @@
               <div class="level-left">
                 <div class="level-item">
                   <section v-if="!isEditing">
-                    <b-field>
+                    <b-field message="PDF only (1 Mb max)">
                       <b-upload v-model="files" multiple accept="application/pdf">
                         <a class="button">
                           <b-icon class="file-icon" icon="paperclip"></b-icon>
@@ -25,7 +25,9 @@
                       </b-upload>
                     </b-field>
 
-                    <b-field grouped group-multiline>
+                    <b-field grouped group-multiline
+                      :type="{ 'is-danger': !isFileWithinSize }"
+                      :message="{ 'One file exceeds 1 Mb': !isFileWithinSize }">
                       <div class="control" v-for="(file, index) in files" :key="index">
                         <b-tag
                           type="is-primary"
@@ -48,7 +50,7 @@
                   <b-button
                     type="is-primary"
                     :loading="isPostButtonLoading"
-                    :disabled="!content.length"
+                    :disabled="!content.length || !isFileWithinSize"
                     @click="createOrUpdatePost">
                       {{ isEditing ? 'Update' : 'Post' }}
                   </b-button>
@@ -93,6 +95,10 @@ export default {
   },
   computed: {
     ...mapState(['user','userRole']),
+    isFileWithinSize() {
+      const size = 1024 * 1024 // 1 Mb
+      return this.files.length === this.files.filter(f => f.size <= size).length
+    }
   },
   methods: {
     deleteUploadFile(index) {

@@ -45,15 +45,17 @@
               </b-taglist>
               <p class="is-size-7">Last Submission: {{ submission.createdAt.toLocaleString() }}</p>
             </template>
-            <b-field message="PDF only">
-              <b-upload v-model="files" multiple expanded required accept="application/pdf">
+            <b-field message="PDF only (1 Mb per file)">
+              <b-upload v-model="files" multiple expanded :required="!submission" accept="application/pdf">
                 <a class="button is-fullwidth">
                     <b-icon class="file-icon" icon="paperclip"></b-icon>
                     <span class="file-label">Attach</span>
                 </a>
               </b-upload>
             </b-field>
-            <b-field grouped group-multiline>
+            <b-field grouped group-multiline
+              :type="{ 'is-danger': !isFileWithinSize }"
+              :message="{ 'One file exceeds 1 Mb': !isFileWithinSize }">
               <div class="control" v-for="(file, index) in files" :key="index">
                 <b-tag
                     type="is-primary"
@@ -72,7 +74,7 @@
               :type="{ 'is-danger': isDueDateOver }"
               :message="{ 'Due date passed': isDueDateOver }">
               <div class="control">
-                <b-button native-type="submit" type="is-primary" :disabled="isSubmissionEnded" :loading="isLoading" expanded>Submit</b-button>
+                <b-button native-type="submit" type="is-primary" :disabled="isSubmissionEnded || !isFileWithinSize" :loading="isLoading" expanded>Submit</b-button>
                 <!--<button class="button is-primary is-fullwidth">Submit</button>-->
               </div>
             </b-field>          
@@ -130,6 +132,10 @@ export default {
     },
     isSubmissionEnded() {
       return this.submission ? this.isDueDateOver || this.submission.isGraded : this.isDueDateOver
+    },
+    isFileWithinSize() {
+      const size = 1024 * 1024 // 1 Mb
+      return this.files.length === this.files.filter(f => f.size <= size).length
     }
   },
   methods: {
@@ -172,12 +178,14 @@ export default {
         .collection('submissions').doc(this.$store.state.user.uid)
         .get()
         .then(doc => {
-          const data = doc.data()
-          this.message = data.message
-          this.submission = {
-            ...data,
-            createdAt: data.createdAt.toDate(),
-            modifiedAt: data.modifiedAt.toDate(),
+          if (doc.exists) {
+            const data = doc.data()
+            this.message = data.message
+            this.submission = {
+              ...data,
+              createdAt: data.createdAt.toDate(),
+              modifiedAt: data.modifiedAt.toDate(),
+            }
           }
         }).catch(e => console.log(e.message))
     },
@@ -185,11 +193,12 @@ export default {
       this.isLoading = true
       try {
         let attachments = []
-        if (this.files.length > 0) {
+        
+        if (this.files.length > 0 && this.isFileWithinSize) {
             attachments = await this.uploadFiles()
         }
 
-        const assignmentSubmission = {
+        const assignmentSubmissionNew = {
           message: this.message,
           attachments,
           submittedBy: {
@@ -199,10 +208,17 @@ export default {
           createdAt: firebase.firestore.FieldValue.serverTimestamp(),
           modifiedAt: firebase.firestore.FieldValue.serverTimestamp(),
         }
-
+        if (this.submission) { attachments = attachments.concat(this.submission.attachments) }
+        const assignmentSubmissionEdit = {
+          message: this.message,
+          attachments,
+          modifiedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        }
+        const assignmentSubmission = this.submission ? assignmentSubmissionEdit : assignmentSubmissionNew
+        
         await db.doc(`subjects/${this.$route.params.subjectCode}/assignments/${this.$route.params.assignmentId}`)
           .collection('submissions').doc(this.$store.state.user.uid)
-          .set(assignmentSubmission)
+          .set(assignmentSubmission, { merge: this.submission ? true : false })
         
         this.onSuccess('submitted')
 

@@ -85,14 +85,14 @@
           <b-icon icon="clipboard-text"></b-icon>
           <span> Assignments <b-tag rounded> {{assignments.length}} </b-tag> </span>
         </template>
-        <b-collapse v-for="(assignment, index) in assignments" :key="assignment.id" class="card" animation="slide">
+        <b-collapse v-for="(assignment, index) in assignments" :key="assignment.id" class="card" animation="slide"
+          :open="index === 0 ? true : false">
           <div
             slot="trigger"
             slot-scope="props"
             class="card-header"
             role="button"
-            aria-controls="contentIdForA11y3"
-            :open="index === 0 ? true : false">
+            aria-controls="contentIdForA11y3">
             <p class="card-header-title">
               <b-icon icon="school" custom-size="default" />
               {{assignment.title}}
@@ -200,7 +200,10 @@ export default {
       return this.subjectDetails.subjectCode || null
     },
     isAdminOrTeacher() {
-      return this.userRole.includes('admin') || this.userRole.includes('teacher')
+      return this.userRole.includes('admin') || this.isTeacher
+    },
+    isTeacher() {
+      return this.userRole.includes('teacher')
     },
     isStudent() {
       return this.userRole.includes('student')
@@ -283,8 +286,16 @@ export default {
     getLectures() {
       this.isPageLoading = true
       let lectures = []
-      db.collection('subjects').doc(this.subjectCode)
-        .collection('lectures').get()
+      const dbRef = () => {
+        let ref = db.collection('subjects').doc(this.subjectCode).collection('lectures')
+        const userId = this.$store.state.user.uid
+        if (this.isTeacher) {
+          return ref.where('createdBy.uid', '==', userId)
+        } else {
+          return ref
+        }
+      }
+      dbRef().get()
         .then(snapshot => {
           snapshot.forEach(s => {
             const data = s.data()
@@ -297,14 +308,25 @@ export default {
               modifiedAt: data.modifiedAt.toDate(),
             })
           })
+          lectures.sort((a, b) => b.startTime.getTime() - a.startTime.getTime())
           this.lectures = lectures
           this.isPageLoading = false
-        })
+        }).catch((e) => this.onFailure(e))
     },
     getAssignments() {
       let assignments = []
-      db.collection('subjects').doc(this.subjectCode)
-        .collection('assignments').get()
+      const dbRef = () => {
+        let ref = db.collection('subjects').doc(this.subjectCode).collection('assignments')
+        const userId = this.$store.state.user.uid
+        if (this.isStudent) {
+          return ref.where('allotedStudents', 'array-contains', userId)
+        } else if (this.isTeacher) {
+          return ref.where('createdBy.uid', '==', userId)
+        } else {
+          return ref
+        }
+      }
+      dbRef().get()
         .then(snapshot => {
           snapshot.forEach(s => {
             const data = s.data()
@@ -316,8 +338,17 @@ export default {
               modifiedAt: data.modifiedAt.toDate(),
             })
           })
+          assignments.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
           this.assignments = assignments
-        })
+        }).catch((e) => this.onFailure(e))
+    },
+    onFailure(e) {
+      //console.log(e)
+      this.$buefy.toast.open({
+        message: `Error: ${e.message}`,
+        type: 'is-danger',
+        queue: false
+      })
     }
   },
   created() {

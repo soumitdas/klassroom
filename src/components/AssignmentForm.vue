@@ -25,7 +25,7 @@
                     </b-tag>
                 </b-taglist>
 
-                <b-field v-else message="PDF only">
+                <b-field v-else message="PDF only (Max 1 Mb)">
                     <b-upload v-model="files" multiple accept="application/pdf">
                     <a class="button">
                         <b-icon class="file-icon" icon="paperclip"></b-icon>
@@ -33,7 +33,9 @@
                     </a>
                     </b-upload>
                 </b-field>
-                <b-field grouped group-multiline>
+                <b-field grouped group-multiline
+                    :type="{ 'is-danger': !isFileWithinSize }"
+                    :message="{ 'One file exceeds 1 Mb': !isFileWithinSize }">
                     <div class="control" v-for="(file, index) in files" :key="index">
                     <b-tag
                         type="is-primary"
@@ -101,7 +103,7 @@
     </section>
     <footer class="modal-card-foot">
       <b-button @click="$parent.close()">Close</b-button>
-      <b-button native-type="submit" type="is-primary" :loading="isLoading">{{ isEditing ? 'Update' : 'Save' }}</b-button>
+      <b-button native-type="submit" type="is-primary" :disabled="!isFileWithinSize" :loading="isLoading">{{ isEditing ? 'Update' : 'Save' }}</b-button>
     </footer>
   </form>
 </template>
@@ -162,6 +164,10 @@ export default {
       classStudents() {
           return this.students.filter(s => this.subject.studentId.includes(s.uid))
       },
+      isFileWithinSize() {
+        const size = 1024 * 1024 // 1 Mb
+        return this.files.length === this.files.filter(f => f.size <= size).length
+        }
   },
   methods: {
     deleteUploadFile(index) {

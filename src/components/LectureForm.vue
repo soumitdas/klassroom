@@ -18,14 +18,14 @@
                 <b-field label="Lecture Description" label-position="on-border">
                     <b-input v-model="lecture.description" maxlength="300" type="textarea" placeholder="Write something about the lecture..."></b-input>
                 </b-field>
-                <b-field message="PDF only">
+                <!--<b-field message="PDF only">
                     <b-upload disabled multiple accept="application/pdf">
                     <a class="button">
                         <b-icon class="file-icon" icon="paperclip"></b-icon>
                         <span class="file-label">Attach</span>
                     </a>
                     </b-upload>
-                </b-field>
+                </b-field>-->
                 <b-field label="Mode of Delivery" label-position="on-border">
                     <b-select v-model="lecture.mode" placeholder="Select a Method" required>
                         <option value="virtual">Virtual Mode</option>
