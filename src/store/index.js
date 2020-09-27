@@ -180,7 +180,7 @@ export default new Vuex.Store({
         subjects = docs.map(doc => {
           const data = doc.data()
           return { subjectCode: doc.id, ...data, startDate: data.startDate.toDate(),endDate: data.endDate.toDate(),
-          schedule: data.schedule.map(s => ({ ...s, start: s.start.toDate(), end: s.end.toDate() })) }
+          ...(data.schedule.start && data.schedule.end && {schedule: data.schedule.map(s => ({ ...s, start: s.start.toDate(), end: s.end.toDate() }))}) }
         })
         
       } else if (state.userRole.includes('teacher')) {
@@ -189,7 +189,7 @@ export default new Vuex.Store({
         subjects = docs.map(doc => {
           const data = doc.data()
           return { subjectCode: doc.id, ...data, startDate: data.startDate.toDate(),endDate: data.endDate.toDate(),
-          schedule: data.schedule.map(s => ({ ...s, start: s.start.toDate(), end: s.end.toDate() })) }
+            ...(data.schedule.start && data.schedule.end && {schedule: data.schedule.map(s => ({ ...s, start: s.start.toDate(), end: s.end.toDate() }))}) }
         })
         
       } else if (state.userRole.includes('student')) {
@@ -198,7 +198,7 @@ export default new Vuex.Store({
         subjects = docs.map(doc => {
           const data = doc.data()
           return { subjectCode: doc.id, ...data, startDate: data.startDate.toDate(),endDate: data.endDate.toDate(),
-          schedule: data.schedule.map(s => ({ ...s, start: s.start.toDate(), end: s.end.toDate() })) }
+            ...(data.schedule.start && data.schedule.end && {schedule: data.schedule.map(s => ({ ...s, start: s.start.toDate(), end: s.end.toDate() }))}) }
         })
 
       }
