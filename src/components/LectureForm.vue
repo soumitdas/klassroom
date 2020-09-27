@@ -197,12 +197,14 @@ export default {
             return this.subject.schedule.map(s => {
                 let startTime = new Date()
                 let endTime = new Date()
-                startTime.setHours(s.start.getHours())
-                startTime.setMinutes(s.start.getMinutes())
-                startTime.setSeconds(s.start.getSeconds())
-                endTime.setHours(s.end.getHours())
-                endTime.setMinutes(s.end.getMinutes())
-                endTime.setSeconds(s.end.getSeconds())
+                if (s.start && s.end) {
+                    startTime.setHours(s.start.getHours())
+                    startTime.setMinutes(s.start.getMinutes())
+                    startTime.setSeconds(s.start.getSeconds())
+                    endTime.setHours(s.end.getHours())
+                    endTime.setMinutes(s.end.getMinutes())
+                    endTime.setSeconds(s.end.getSeconds())
+                }
                 return {startTime, endTime}
             })
         } else {

@@ -179,8 +179,8 @@ export default new Vuex.Store({
         const {docs} = await db.collection('subjects').get()
         subjects = docs.map(doc => {
           const data = doc.data()
-          return { subjectCode: doc.id, ...data, startDate: data.startDate.toDate(),endDate: data.endDate.toDate(),
-          ...(data.schedule.start && data.schedule.end && {schedule: data.schedule.map(s => ({ ...s, start: s.start.toDate(), end: s.end.toDate() }))}) }
+          return { subjectCode: doc.id, ...data, ...(data.startDate && data.endDate && { startDate: data.startDate.toDate(), endDate: data.endDate.toDate() }),
+            schedule: data.schedule.map(s => ({ ...s, ...(s.start && s.end && { start: s.start.toDate(), end: s.end.toDate() }) })) }       
         })
         
       } else if (state.userRole.includes('teacher')) {
@@ -188,8 +188,8 @@ export default new Vuex.Store({
         const {docs} = await db.collection('subjects').where('teacherId', 'array-contains', userId).get()
         subjects = docs.map(doc => {
           const data = doc.data()
-          return { subjectCode: doc.id, ...data, startDate: data.startDate.toDate(),endDate: data.endDate.toDate(),
-            ...(data.schedule.start && data.schedule.end && {schedule: data.schedule.map(s => ({ ...s, start: s.start.toDate(), end: s.end.toDate() }))}) }
+          return { subjectCode: doc.id, ...data, ...(data.startDate && data.endDate && { startDate: data.startDate.toDate(), endDate: data.endDate.toDate() }),
+            schedule: data.schedule.map(s => ({ ...s, ...(s.start && s.end && { start: s.start.toDate(), end: s.end.toDate() }) })) }
         })
         
       } else if (state.userRole.includes('student')) {
@@ -197,8 +197,8 @@ export default new Vuex.Store({
         const {docs} = await db.collection('subjects').where('studentId', 'array-contains', userId).get()
         subjects = docs.map(doc => {
           const data = doc.data()
-          return { subjectCode: doc.id, ...data, startDate: data.startDate.toDate(),endDate: data.endDate.toDate(),
-            ...(data.schedule.start && data.schedule.end && {schedule: data.schedule.map(s => ({ ...s, start: s.start.toDate(), end: s.end.toDate() }))}) }
+          return { subjectCode: doc.id, ...data, ...(data.startDate && data.endDate && { startDate: data.startDate.toDate(), endDate: data.endDate.toDate() }),
+            schedule: data.schedule.map(s => ({ ...s, ...(s.start && s.end && { start: s.start.toDate(), end: s.end.toDate() }) })) }
         })
 
       }

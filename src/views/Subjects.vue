@@ -71,7 +71,7 @@
           </b-table-column>
           <b-table-column label="Schedule" field="schedule" :visible="visible.schedule" centered>
             <b-taglist>
-              <b-tag v-for="s in props.row.schedule" :key="s.uid">{{ days[s.day] }} - {{ s.start.toLocaleTimeString('en-IN') }} to {{ s.end.toLocaleTimeString('en-IN') }}</b-tag>
+              <b-tag v-for="s in props.row.schedule" :key="s.uid">{{ days[s.day] }} - {{ s.start ? s.start.toLocaleTimeString('en-IN') : '' }} to {{ s.end ? s.end.toLocaleTimeString('en-IN') : '' }}</b-tag>
             </b-taglist>
           </b-table-column>
           <b-table-column label="Start Date" field="startDate" :visible="visible.startEndDate" centered>
@@ -137,7 +137,7 @@
                 field="univRoll"
                 icon=""
                 placeholder="Add a Student"
-                append-to-body
+                append-to-body required
                 @typing="getFilteredStudents">
               </b-taginput>
             </b-field>
@@ -149,7 +149,7 @@
                 field="name"
                 icon=""
                 placeholder="Add a Teacher"
-                append-to-body
+                append-to-body required
                 @typing="getFilteredTeachers">
               </b-taginput>
             </b-field>
@@ -157,7 +157,8 @@
               <b-datepicker
                 placeholder="Select the Date Range"
                 v-model="subDates"
-                range>
+                range
+                required>
               </b-datepicker>
             </b-field>
             <div class="field">

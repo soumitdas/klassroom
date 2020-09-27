@@ -4,7 +4,8 @@
       {{this.$route.meta.title}}
       <b-button type="is-primary" icon-left="refresh" slot="button" @click="fetchSubjects">Refresh</b-button>
     </title-bar>
-    <b-collapse v-for="subject in subjects" :key="subject.subjectCode" class="card" animation="slide" aria-id="contentIdForA11y3">
+    <b-collapse v-for="(subject, index) in subjects" :key="subject.subjectCode" class="card" animation="slide" aria-id="contentIdForA11y3"
+      :open="index === 0 ? true : false">
       <div
           slot="trigger" 
           slot-scope="props"
