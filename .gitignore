@@ -5,7 +5,6 @@ dist
 
 .firebase
 
-functions
 src/firebase.js
 
 # local env files
