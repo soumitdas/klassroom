@@ -18,6 +18,7 @@ import {auth} from '../firebase'
 export default {
   beforeCreate() {
     this.$store.commit('hideAsideNavbar',false)
+    this.$store.dispatch('fetchAll')
   },
   components: { FooterBar, AsideMenu, NavBar },
   computed: {

@@ -1,5 +1,35 @@
 <template>
     <div>
+        <div class="level">
+        <div class="level-left">
+            <b-field grouped group-multiline>
+            <p class="control">
+                <b-switch v-model="visible.classRoll">
+                    Show Class Roll
+                </b-switch>
+            </p>
+            <p class="control">
+                <b-switch v-model="searchable">
+                    Searchable
+                </b-switch>
+            </p>
+            </b-field>
+        </div>
+        <div class="level-right">
+            <b-field grouped>
+                <p class="control">
+                    <b-button icon-left="export" disabled>Export to CSV</b-button>
+                </p>
+            <b-select v-model="perPage">
+                <option value="10">10 per page</option>
+                <option value="15">15 per page</option>
+                <option value="20">20 per page</option>
+                <option value="30">30 per page</option>
+                <option value="50">50 per page</option>
+            </b-select>
+            </b-field>
+        </div>
+        </div>
         <card-component class="has-table" title="Submissions" icon="clipboard-text" headerIcon="refresh" @header-icon-click="getAssignmentSubmissions">
             <b-table
                 :checkable="false"
@@ -8,17 +38,18 @@
                 :per-page="perPage"
                 :striped="false"
                 :hoverable="true"
+                :mobile-cards="false"
                 default-sort="univRoll"
                 :data="submissions">
 
                 <template slot-scope="props">
-                <b-table-column label="University Roll" field="univRoll" sortable>
+                <b-table-column label="University Roll" field="univRoll" :searchable="searchable" sortable>
                     {{ props.row.student.univRoll }}
                 </b-table-column>
-                <b-table-column label="Class Roll" field="classRoll" sortable>
+                <b-table-column label="Class Roll" field="classRoll" :searchable="searchable" :visible="visible.classRoll" sortable>
                     {{ props.row.student.classRoll }}
                 </b-table-column>
-                <b-table-column label="Name" field="name" sortable>
+                <b-table-column label="Name" field="name" :searchable="searchable" sortable>
                     {{ props.row.student.name }}
                 </b-table-column>
                 <b-table-column label="Submitted Docs" field="attachments" centered>
@@ -106,7 +137,12 @@ export default {
             perPage: 10,
             submissions: [],
             isFormVisible: false,
-            currentItem: null
+            currentItem: null,
+
+            visible: {
+                classRoll: false
+            },
+            searchable: false
         }
     },
     computed: {

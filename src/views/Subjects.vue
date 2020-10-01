@@ -137,7 +137,7 @@
                 field="univRoll"
                 icon=""
                 placeholder="Add a Student"
-                append-to-body required
+                append-to-body
                 @typing="getFilteredStudents">
               </b-taginput>
             </b-field>
@@ -149,7 +149,7 @@
                 field="name"
                 icon=""
                 placeholder="Add a Teacher"
-                append-to-body required
+                append-to-body
                 @typing="getFilteredTeachers">
               </b-taginput>
             </b-field>

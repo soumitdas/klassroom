@@ -205,10 +205,16 @@ export default new Vuex.Store({
       commit('setSubjects', subjects)
     },
 
-    async fetchAll({ dispatch }) {
-      await dispatch('fetchStudents')
-      await dispatch('fetchTeachers')
-      await dispatch('fetchSubjects')
+    async fetchAll({ dispatch, state }) {
+
+      if (state.userRole.includes('admin')) {
+        await dispatch('fetchStudents')
+        await dispatch('fetchTeachers')
+        await dispatch('fetchSubjects')
+      } else if (state.userRole.includes('teacher')) {
+        await dispatch('fetchStudents')
+      }
+           
     }
   }
 })

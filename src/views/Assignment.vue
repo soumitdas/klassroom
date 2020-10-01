@@ -68,18 +68,24 @@
               </div>
             </b-field>
             <b-field label="Message" label-position="on-border">
-                <b-input v-model="message" maxlength="200" type="textarea"></b-input>
+                <b-input v-model="message" maxlength="200" type="textarea"
+                  :readonly="isAssignmentSubmitted"></b-input>
             </b-field>
-            <b-field
+            <b-field v-show="isAssignmentSubmitted">
+              <b-button type="is-primary" @click="isAssignmentSubmitted = false" :disabled="isSubmissionEnded" expanded>Edit Submission</b-button>
+            </b-field>
+            <b-field v-show="!isAssignmentSubmitted"
               :type="{ 'is-danger': isDueDateOver }"
               :message="{ 'Due date passed': isDueDateOver }">
               <div class="control">
                 <b-button native-type="submit" type="is-primary" :disabled="isSubmissionEnded || !isFileWithinSize" :loading="isLoading" expanded>Submit</b-button>
-                <!--<button class="button is-primary is-fullwidth">Submit</button>-->
               </div>
             </b-field>          
           </form>
         </div>
+      </div>
+      <div v-else-if="isAssignmentNotAlloted" class="subtitle has-text-centered">
+        Something went wrong. Contact your course instructor for support.
       </div>
       <div v-else>
         <b-skeleton></b-skeleton>
@@ -108,7 +114,9 @@ export default {
       submission: null,
       message: '',
       files: [],
-      isLoading: false
+      isLoading: false,
+      isAssignmentNotAlloted: false,
+      isAssignmentSubmitted: false
     }
   },
   computed: {
@@ -170,7 +178,10 @@ export default {
           } else {
             this.$router.replace({ path: '/error'})
           }
-        }).catch(e => console.log(e.message))
+        }).catch(e => {
+          this.onFailure(e)
+          this.isAssignmentNotAlloted = true
+        })
         this.getAssignmentSubmission()
     },
     getAssignmentSubmission() {
@@ -186,8 +197,9 @@ export default {
               createdAt: data.createdAt.toDate(),
               modifiedAt: data.modifiedAt.toDate(),
             }
+            this.isAssignmentSubmitted = true
           }
-        }).catch(e => console.log(e.message))
+        }).catch(e => this.onFailure(e))
     },
     async submitAssignment() {
       this.isLoading = true
