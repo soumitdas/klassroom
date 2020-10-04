@@ -4,6 +4,7 @@ misc
 dist
 
 .firebase
+.firebaserc
 firestore.rules
 firestore.indexes.json
 

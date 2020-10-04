@@ -111,18 +111,5 @@ export default {
       this.$store.dispatch('fetchAll')
     }
   },
-/*  created() {
-    db.collection('users').where('role', 'array-contains', 'student')
-    .onSnapshot(function(querySnapshot) {
-        querySnapshot.forEach(function(doc) {
-            // doc.data() is never undefined for query doc snapshots
-            console.log(doc.id, " => ", doc.data().role[0] + ' ' + doc.data().studentData);
-        });
-    })
-    .catch(function(error) {
-        console.log("Error getting documents: ", error);
-    });
-  }*/
-
 }
 </script>
