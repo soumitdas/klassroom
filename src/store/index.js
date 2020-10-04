@@ -16,7 +16,11 @@ export default new Vuex.Store({
       phone: null
     },
     userRole: [],
+    userProfile: null,
     userEmailVerified: null,
+
+    // Institute
+    instituteDetails: null,
 
     // Students
     students: [],
@@ -66,6 +70,12 @@ export default new Vuex.Store({
     },
     setUserRole (state, payload) {
       state.userRole = payload.role ? payload.role : []
+    },
+    setInstitute (state, payload) {
+      payload ? state.instituteDetails = payload : state.instituteDetails = null 
+    },
+    setUserProfile (state, payload) {
+      state.userProfile = payload ? payload : null 
     },
 
     setStudents (state, payload) {
@@ -153,6 +163,17 @@ export default new Vuex.Store({
     fetchAuthUser({ commit }) {
       commit('setUser', auth.currentUser)
     },
+    async fetchInstituteDetails({ commit }) {
+      const doc = await db.doc('settings/institute').get()
+      const institute = doc.data()
+      commit('setInstitute', {...institute, modifiedAt: institute.modifiedAt.toDate()})
+    },
+    async fetchUserProfile({ commit }, uid) {
+      if (uid) {
+        const user = await db.collection('users').doc(uid).get()
+        commit('setUserProfile', user.data())
+      }
+    },
 
     async fetchStudents({ commit }) {
       const ref = db.collection('users').where('role', 'array-contains', 'student')
@@ -206,6 +227,9 @@ export default new Vuex.Store({
     },
 
     async fetchAll({ dispatch, state }) {
+
+      await dispatch('fetchInstituteDetails')
+      await dispatch('fetchUserProfile', state.user.uid)
 
       if (state.userRole.includes('admin')) {
         await dispatch('fetchStudents')

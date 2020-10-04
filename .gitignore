@@ -4,6 +4,8 @@ misc
 dist
 
 .firebase
+firestore.rules
+firestore.indexes.json
 
 src/firebase.js
 

@@ -5,7 +5,7 @@
         <div class="level-left">
           <div class="level-item">
             <div>
-              <b>Klassroom</b> <span class="tag">v0.1</span>
+              <b>Klassroom</b> <span class="tag">v0.1 (alpha)</span>
             </div>
           </div>
         </div>

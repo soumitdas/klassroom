@@ -4,10 +4,9 @@
       <a class="navbar-item is-hidden-desktop" @click.prevent="menuToggleMobile">
         <b-icon :icon="menuToggleMobileIcon"/>
       </a>
-      <router-link to="/" class="navbar-item is-size-4">
-        Klassroom
+      <router-link to="/" class="navbar-item is-size-5">
+        {{ instituteDetails ? instituteDetails.name : 'Klassroom' }}
       </router-link>
-      <small>(alpha)</small>
     </div>
     <div class="navbar-brand is-right">
       <div class="navbar-item navbar-item-menu-toggle is-hidden-desktop">
@@ -75,7 +74,8 @@ export default {
     ...mapState([
       'user',
       'isNavBarVisible',
-      'isAsideMobileExpanded'
+      'isAsideMobileExpanded',
+      'instituteDetails'
     ])
   },
   methods: {
