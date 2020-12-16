@@ -23,7 +23,7 @@ export default {
   methods: {
     forgotPassword() {
       this.isSubmitButtonLoading = true
-      const url = `${window.location.protocol}//${window.location.hostname}`
+      const url = process.env.VUE_APP_BASE_URL
       auth.sendPasswordResetEmail(this.userEmail, { url , handleCodeInApp: false })
       .then(() => {
         this.isSubmitButtonLoading = false

@@ -35,14 +35,15 @@ const settings = {
     icon: 'cog'
 }
 
-const reports = {
-    to: '/reports',
-    label: 'Reports',
-    icon: 'file-chart'
-}
+// For future version
+// const reports = {
+//     to: '/reports',
+//     label: 'Reports',
+//     icon: 'file-chart'
+// }
 
 export default {
-    admin: [dashboard, students, teachers, subjects, classroom, reports, settings],
+    admin: [dashboard, students, teachers, subjects, classroom, settings],
     student: [dashboard, classroom],
-    teacher: [dashboard, students, classroom, reports]
+    teacher: [dashboard, students, classroom]
 }

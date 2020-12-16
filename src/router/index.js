@@ -87,12 +87,13 @@ Vue.use(VueRouter)
     component: () => import(/* webpackChunkName: "admin-dash" */ '../views/Settings.vue'),
     meta: { title: 'Settings', layout: DefaultLayout, requiresAuth: true }
   },
-  {
-    path: '/reports',
-    name: 'reports',
-    component: () => import(/* webpackChunkName: "admin-dash" */ '../views/Reports.vue'),
-    meta: { title: 'Reports', layout: DefaultLayout, requiresAuth: true }
-  },
+  // This feature will be in future version
+  // {
+  //   path: '/reports',
+  //   name: 'reports',
+  //   component: () => import(/* webpackChunkName: "admin-dash" */ '../views/Reports.vue'),
+  //   meta: { title: 'Reports', layout: DefaultLayout, requiresAuth: true }
+  // },
   {
     path: '*',
     name: 'PageNotFound',

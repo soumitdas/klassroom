@@ -1,8 +1,3 @@
-/**
- * Change the filename from 'firebase.js.sample' to 'firebase.js'
- * after pasting the Firebase credentials
- */
-
 import * as firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
@@ -10,9 +5,7 @@ import 'firebase/functions'
 import 'firebase/storage'
 
 // firebase init
-const firebaseConfig = {
-  // Here paste the Firebase credentials
-};
+const firebaseConfig = JSON.parse(process.env.VUE_APP_FIREBASE_CONFIG || {})
 
 firebase.initializeApp(firebaseConfig)
 

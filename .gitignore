@@ -5,10 +5,6 @@ dist
 
 .firebase
 .firebaserc
-firestore.rules
-firestore.indexes.json
-
-src/firebase.js
 
 # local env files
 .env.local

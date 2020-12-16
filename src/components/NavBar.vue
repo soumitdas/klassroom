@@ -4,9 +4,14 @@
       <a class="navbar-item is-hidden-desktop" @click.prevent="menuToggleMobile">
         <b-icon :icon="menuToggleMobileIcon"/>
       </a>
-      <router-link to="/" class="navbar-item is-size-5">
-        {{ instituteDetails ? instituteDetails.name : 'Klassroom' }}
-      </router-link>
+      <div class="navbar-item">
+        <router-link to="/" class="is-size-5 is-hidden-mobile">
+          {{ instituteDetails ? instituteDetails.name : '' }}
+        </router-link>
+        <router-link to="/" class="is-size-7 is-hidden-tablet">
+          {{ instituteDetails ? instituteDetails.name : '' }}
+        </router-link>
+      </div>
     </div>
     <div class="navbar-brand is-right">
       <div class="navbar-item navbar-item-menu-toggle is-hidden-desktop">
