@@ -1,0 +1,108 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+  	function isSignedInWithRole() {
+      return request.auth != null && 'role' in request.auth.token;
+    }
+  	function isAdmin() {
+    	return isSignedInWithRole() && 'admin' in request.auth.token.role;
+    }
+    function isTeacher() {
+    	return isSignedInWithRole() && 'teacher' in request.auth.token.role;
+    }
+    function isStudent() {
+    	return isSignedInWithRole() && 'student' in request.auth.token.role;
+    }
+    function isTeacherHasAccessToUser(userId) {
+    	return isTeacher() && belongsTo(userId) || 'student' in resource.data.role;
+    }
+  	function belongsTo(userId) {
+      return isSignedInWithRole() && request.auth.uid == userId;
+    }
+    
+    match /{document=**} {
+      allow read, write: if isAdmin();
+    }
+    
+    match /settings/institute {
+    	allow read: if isSignedInWithRole();
+      allow write: if false;
+    }
+    
+  	match /users/{userId} {
+      allow read, write: if isTeacherHasAccessToUser(userId) || belongsTo(userId);
+    }
+    
+    function isTeacherHasAccessToSubject() {
+    	return isTeacher() && request.auth.uid in resource.data.teacherId;
+    }
+    function isStudentHasAccessToSubject() {
+    	return isStudent() && request.auth.uid in resource.data.studentId;
+    }
+    
+    match /subjects/{subjectId} {
+      allow read: if isTeacherHasAccessToSubject() || isStudentHasAccessToSubject();
+      allow write: if false;
+      
+      function isAllotedStudent() {
+      	let allotedStudents = get(/databases/$(database)/documents/subjects/$(subjectId)).data.studentId;
+      	return isStudent() && request.auth.uid in allotedStudents;
+      }
+      function isAllotedTeacher() {
+      	let allotedTeachers = get(/databases/$(database)/documents/subjects/$(subjectId)).data.teacherId;
+      	return isTeacher() && request.auth.uid in allotedTeachers;
+      }
+      
+      match /discussions/{discussionId} {
+      	allow read, create: if isAllotedStudent() || isAllotedTeacher();
+        allow update, delete: if belongsTo(resource.data.author.uid);
+        
+        match /replies/{replieId} {
+        	allow read, create: if isAllotedStudent() || isAllotedTeacher();
+        	allow update, delete: if belongsTo(resource.data.author.uid); 
+        }
+      }
+      
+      match /lectures/{lectureId} {
+      	allow read: if isAllotedStudent() || isAllotedTeacher();
+        allow create: if isAllotedTeacher();
+        allow update, delete: if belongsTo(resource.data.createdBy.uid);
+      }
+      
+      function isStudentHasAccessToAssignment() {
+        return isStudent() && request.auth.uid in resource.data.allotedStudents;
+      }
+      
+      match /assignments/{assignmentId} {
+      	allow read: if belongsTo(resource.data.createdBy.uid) || isStudentHasAccessToAssignment();
+        allow create: if isAllotedTeacher();
+        allow update, delete: if belongsTo(resource.data.createdBy.uid);
+        
+        function isStudentAllotedAssignment() {
+        	let allotedStudents = get(/databases/$(database)/documents/subjects/$(subjectId)/assignments/$(assignmentId)).data.allotedStudents;
+        	return isStudent() && request.auth.uid in allotedStudents;
+        }
+        
+        //function isWithinDueDate() {
+        //	let dueDate = get(/databases/$(database)/documents/subjects/$(subjectId)/assignments/$(assignmentId)).data.dueDate;
+        //  return request.time.toMillis() <= dueDate.seconds() * 1000;
+        //}
+        
+        function canUpdateAssignmentSubmission(userId) {
+        	let isGraded = 'isGraded' in resource.data && resource.data.isGraded == true;
+        	return belongsTo(userId) && !isGraded;
+        }
+        
+        match /submissions/{submissionId} {
+        	allow get: if belongsTo(submissionId);
+        	allow list: if isAllotedTeacher();
+          allow create: if isStudentAllotedAssignment();
+          allow update, delete: if isAllotedTeacher() || canUpdateAssignmentSubmission(submissionId);
+        }
+      }
+            
+    }
+    
+  }
+}

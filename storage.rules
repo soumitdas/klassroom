@@ -1,0 +1,51 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+  
+  	function isSignedInWithRole() {
+      return request.auth != null && 'role' in request.auth.token;
+    }
+  	function isAdmin() {
+    	return isSignedInWithRole() && 'admin' in request.auth.token.role;
+    }
+    function isTeacher() {
+    	return isSignedInWithRole() && 'teacher' in request.auth.token.role;
+    }
+    //function isStudent() {
+    //	return isSignedInWithRole() && 'student' in request.auth.token.role;
+    //}
+    function belongsTo(userId) {
+      return isSignedInWithRole() && request.auth.uid == userId;
+    }
+    
+    function isAvatarImage() {
+    	return request.resource.size <= 200 * 1024 && request.resource.contentType.matches('image/.*');
+    }
+    
+    match /{allPaths=**} {
+      allow read, write: if isAdmin();
+    }
+    
+  	match /avatars/{avatarId} {
+    	allow read: if isSignedInWithRole();
+      allow write: if isAvatarImage() && belongsTo(avatarId);
+    }
+    
+    match /{subjectId}/assignments {
+    	match /{fileName} {
+      	allow read: if isSignedInWithRole();
+        allow write: if request.resource.size <= 1 * 1024 * 1024 && isTeacher();
+      }
+      match /{assignmentId}/{submissionUserId}/{submissionFile} {
+      	allow read: if isSignedInWithRole();
+        allow write: if request.resource.size <= 1 * 1024 * 1024 && belongsTo(submissionUserId);
+      }
+    }
+    
+    match /{subjectId}/discussions/{fileName} {
+    	allow read: if isSignedInWithRole();
+      allow write: if request.resource.size <= 1 * 1024 * 1024 && isSignedInWithRole();
+    }
+  
+  }
+}
